@@ -1,23 +1,41 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import { BrowserRouter, Route, Routes } from 'react-router-dom'
+import { AuthProvider } from './context/AuthProvider'
+import { ProyectosProvider } from './context/ProyectosProvider'
 import AuthLayout from './layouts/AuthLayout'
-import Login from './pages/Login'
-import Registrar from './pages/Registrar'
-import OlvidePassword from './pages/OlvidePassword'
-import NuevoPassword from './pages/NuevoPassword'
+import RutaProtegida from './layouts/RutaProtegida'
 import ConfirmarCuenta from './pages/ConfirmarCuenta'
+import Login from './pages/Login'
+import NuevoPassword from './pages/NuevoPassword'
+import NuevoProyecto from './pages/NuevoProyecto'
+import OlvidePassword from './pages/OlvidePassword'
+import Proyectos from './pages/Proyectos'
+import Proyecto from './pages/Proyecto'
+import Registrar from './pages/Registrar'
+import EditarProyecto from './pages/EditarProyecto'
 
 function App() {
   return (
     <BrowserRouter>
-      <Routes>
-        <Route path='/' element={<AuthLayout />}>
-          <Route index element={<Login />} />
-          <Route path='registrar' element={<Registrar />} />
-          <Route path='olvide-password' element={<OlvidePassword />} />
-          <Route path='nuevo-password/:token' element={<NuevoPassword />} />
-          <Route path='confirmar/:id' element={<ConfirmarCuenta  />} />
-        </Route>
-      </Routes>
+      <AuthProvider>
+        <ProyectosProvider>
+          <Routes>
+            <Route path='/' element={<AuthLayout />}>
+              <Route index element={<Login />} />
+              <Route path='registrar' element={<Registrar />} />
+              <Route path='olvide-password' element={<OlvidePassword />} />
+              <Route path='nuevo-password/:token' element={<NuevoPassword />} />
+              <Route path='confirmar/:id' element={<ConfirmarCuenta />} />
+            </Route>
+
+            <Route path='/proyectos' element={<RutaProtegida />}>
+              <Route index element={<Proyectos />} />
+              <Route path='crear-proyecto' element={<NuevoProyecto />} />
+              <Route path=':id' element={<Proyecto />} />
+              <Route path='editar/:id' element={<EditarProyecto />} />
+            </Route>
+          </Routes>
+        </ProyectosProvider>
+      </AuthProvider>
     </BrowserRouter>
   )
 
