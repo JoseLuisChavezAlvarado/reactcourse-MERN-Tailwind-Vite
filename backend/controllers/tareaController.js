@@ -25,6 +25,11 @@ const agregarTarea = async (req, res) => {
 
     try {
         const tareaAlmacenada = await Tarea.create(req.body)
+
+        //ALMACENAR EL ID EN EL PROYECTO
+        existeProyecto.tareas.push(tareaAlmacenada._id)
+        await existeProyecto.save()
+
         res.json(tareaAlmacenada)
     } catch (error) {
         console.log(error);
@@ -116,7 +121,7 @@ const eliminarTarea = async (req, res) => {
 
         try {
             await tarea.deleteOne()
-            res.json({ msg: 'Tarea Eliminada' })
+            res.json({ msg: 'La tarea se eliminó correctamente' })
         } catch (error) {
             console.log(error);
             return res.status(401).json({ msg: 'Ocurrió un error al actualizar' })

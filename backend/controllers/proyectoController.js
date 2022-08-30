@@ -2,7 +2,10 @@ import Proyecto from "../models/Proyecto.js"
 import Tarea from "../models/Tarea.js"
 
 const obtenerProyectos = async (req, res) => {
-    const proyectos = await Proyecto.find().where('creador').equals(req.usuario)
+    const proyectos = await Proyecto.find()
+        .where('creador')
+        .equals(req.usuario)
+        .select('-tareas')
 
     res.json(proyectos)
 }
@@ -28,7 +31,7 @@ const obtenerProyecto = async (req, res) => {
 
     try {
 
-        const proyecto = await Proyecto.findById(id)
+        const proyecto = await Proyecto.findById(id).populate('tareas')
 
         if (!proyecto) {
             const error = new Error('Proyecto no encontrado')
@@ -108,6 +111,10 @@ const eliminarProyecto = async (req, res) => {
         return res.status(404).json({ msg: 'Proyecto no encontrado' })
     }
 
+}
+
+const buscarColaborador = async (req, res) => {
+    
 }
 
 const agregarColaborador = async (req, res) => {

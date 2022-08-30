@@ -4,6 +4,7 @@ import { ProyectosProvider } from './context/ProyectosProvider'
 import AuthLayout from './layouts/AuthLayout'
 import RutaProtegida from './layouts/RutaProtegida'
 import ConfirmarCuenta from './pages/ConfirmarCuenta'
+import NuevoColaborador from './pages/NuevoColaborador'
 import Login from './pages/Login'
 import NuevoPassword from './pages/NuevoPassword'
 import NuevoProyecto from './pages/NuevoProyecto'
@@ -32,6 +33,7 @@ function App() {
               <Route path='crear-proyecto' element={<NuevoProyecto />} />
               <Route path=':id' element={<Proyecto />} />
               <Route path='editar/:id' element={<EditarProyecto />} />
+              <Route path='nuevo-colaborador/:id' element={<NuevoColaborador />} />
             </Route>
           </Routes>
         </ProyectosProvider>
