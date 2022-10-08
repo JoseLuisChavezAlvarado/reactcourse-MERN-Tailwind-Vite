@@ -1,8 +1,6 @@
-import { createContext } from "react";
-import { useEffect } from "react";
-import { useState } from "react";
+import { createContext, useEffect, useState } from "react";
+import { useNavigate } from 'react-router-dom';
 import clienteAxios from "../config/clienteAxios";
-import { useNavigate } from 'react-router-dom'
 
 const ProyectosContext = createContext()
 
@@ -14,6 +12,8 @@ const ProyectosProvider = ({ children }) => {
     const [alerta, setAlerta] = useState({})
     const [tarea, setTarea] = useState({});
     const [modalEliminarTarea, setModalEliminarTarea] = useState(false);
+    const [modalEliminarColaborador, setModalEliminarColaborador] = useState(false);
+    const [colaborador, setColaborador] = useState({});
 
     const [modalFormularioTarea, setModalFormularioTarea] = useState(false)
 
@@ -289,10 +289,114 @@ const ProyectosProvider = ({ children }) => {
     }
 
     const submitColaborador = async (email) => {
-        console.log(email);
 
-        setAlerta({})
+
+        const token = localStorage.getItem("token")
+        if (!token) { return }
+
+        const config = {
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`,
+            }
+        }
+
+        setCargado(true)
+
+        try {
+            const { data } = await clienteAxios.post('/proyectos/colaboradores', { email }, config)
+            setColaborador(data)
+            setAlerta({})
+        } catch (error) {
+            setColaborador({})
+            setAlerta({
+                msg: error.response.data.msg,
+                error: true
+            })
+        } finally {
+            setCargado(false)
+        }
+
     }
+
+
+    const agregarColaborador = async (email) => {
+
+        const token = localStorage.getItem("token")
+        if (!token) { return }
+
+        const config = {
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`,
+            }
+        }
+
+        try {
+            const { data } = await clienteAxios.post(`/proyectos/colaboradores/${proyecto._id}`, { email }, config)
+
+            setColaborador({})
+            setAlerta({
+                msg: data.msg,
+                error: false
+            })
+
+        } catch (error) {
+            console.log(error.response);
+            setAlerta({
+                msg: error.response.data.msg,
+                error: true
+            })
+        }
+
+    }
+
+    const handleModalEliminarColaborador = colaborador => {
+        setModalEliminarColaborador(!modalEliminarColaborador)
+        setColaborador(colaborador);
+    }
+
+    const eliminarColaborador = async () => {
+
+        const token = localStorage.getItem("token")
+        if (!token) { return }
+
+        const config = {
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`,
+            }
+        }
+
+        try {
+            const { data } = await clienteAxios.post(`/proyectos/eliminar-colaborador/${proyecto._id}`, { id: colaborador._id }, config)
+
+            const proyectoActualizado = { ...proyecto }
+            proyectoActualizado.colaboradores = proyectoActualizado.colaboradores.filter(colaboradorState => colaboradorState._id !== colaborador._id)
+            setProyecto(proyectoActualizado)
+
+            handleModalEliminarColaborador()
+            setColaborador({})
+            setAlerta({
+                msg: data.msg,
+                error: false
+            })
+
+        } catch (error) {
+            console.log(error.response);
+            setAlerta({
+                msg: error.response.msg,
+                error: true
+            })
+        } finally {
+            setTimeout(() => {
+                setAlerta({})
+            }, 3000);
+        }
+
+    }
+
+
     //====================================================================
 
     return (
@@ -303,8 +407,10 @@ const ProyectosProvider = ({ children }) => {
                 cargado,
                 proyecto,
                 proyectos,
+                colaborador,
                 modalEliminarTarea,
                 modalFormularioTarea,
+                modalEliminarColaborador,
                 submitTarea,
                 setProyectos,
                 mostrarAlerta,
@@ -314,8 +420,11 @@ const ProyectosProvider = ({ children }) => {
                 eliminarProyecto,
                 handleModalTarea,
                 submitColaborador,
+                agregarColaborador,
+                eliminarColaborador,
                 handleModalEditarTarea,
                 handleModalEliminarTarea,
+                handleModalEliminarColaborador,
             }}
         >{children}
         </ProyectosContext.Provider>
@@ -325,6 +434,6 @@ const ProyectosProvider = ({ children }) => {
 
 export {
     ProyectosProvider
-}
+};
 
 export default ProyectosContext
